@@ -50,7 +50,7 @@ export class EventsGateway
     server.use(SocketAuthMiddleware(this.authService) as any);
   }
 
-  handleConnection(socket: AuthenticatedSocket, ...args: any[]): any {
+  handleConnection(socket: AuthenticatedSocket): any {
     Logger.log('user connected in socket', JSON.stringify(socket.user));
     Logger.log('handleConnection');
     this.sessions.setUserSocket(socket.user.id, socket);
