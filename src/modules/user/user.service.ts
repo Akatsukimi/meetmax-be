@@ -42,7 +42,6 @@ export class UserService {
   async createUser(params: CreateUserParams): Promise<User> {
     const profile = new Profile();
     profile.gender = params.gender;
-    profile.birthday = params.birthday;
 
     const user = this.userRepository.create({
       email: params.email,

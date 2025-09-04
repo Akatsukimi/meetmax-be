@@ -3,5 +3,4 @@ export type CreateUserParams = {
   password: string;
   username: string;
   gender: string;
-  birthday: string;
 };
