@@ -30,9 +30,13 @@ export class PostResponseDto {
   @Expose()
   @Type(() => LikePostResponseDto)
   likes: LikePostResponseDto[];
-  remainingLikeCount: number;
+
+  @Expose()
   isLikedByCurrentUser: boolean;
 
   @Expose()
   commentCount: number;
+
+  @Expose()
+  remainingLikeCount: number;
 }
