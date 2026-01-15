@@ -12,17 +12,23 @@ export class FriendService implements IFriendsService {
     private readonly friendsRepository: Repository<Friend>,
   ) {}
 
-  deleteFriend(params: DeleteFriendRequestParams) {}
+  deleteFriend(params: DeleteFriendRequestParams) {
+    console.log('🚀 ~ FriendService ~ deleteFriend ~ params:', params);
+  }
 
   findFriendById(id: string): Promise<Friend> {
+    console.log('🚀 ~ FriendService ~ findFriendById ~ id:', id);
     return Promise.resolve(undefined);
   }
 
   getFriends(id: string): Promise<Friend[]> {
+    console.log('🚀 ~ FriendService ~ getFriends ~ id:', id);
     return Promise.resolve([]);
   }
 
   isFriends(userOneId: string, userTwoId: string): Promise<Friend | undefined> {
+    console.log('🚀 ~ FriendService ~ isFriends ~ userTwoId:', userTwoId);
+    console.log('🚀 ~ FriendService ~ isFriends ~ userOneId:', userOneId);
     return Promise.resolve(undefined);
   }
 }

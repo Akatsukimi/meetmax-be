@@ -26,16 +26,21 @@ export class FriendRequestService implements IFriendRequestService {
   ) {}
 
   accept(params: FriendRequestParams): Promise<AcceptFriendResponse> {
+    console.log('🚀 ~ FriendRequestService ~ accept ~ params:', params);
     return Promise.resolve(undefined);
   }
 
   cancel(params: CancelFriendRequestParams): Promise<FriendRequest> {
+    console.log('🚀 ~ FriendRequestService ~ cancel ~ params:', params);
     return Promise.resolve(undefined);
   }
 
-  create(params: CreateFriendParams) {}
+  create(params: CreateFriendParams) {
+    console.log('🚀 ~ FriendRequestService ~ create ~ params:', params);
+  }
 
   findById(id: string): Promise<FriendRequest> {
+    console.log('🚀 ~ FriendRequestService ~ findById ~ id:', id);
     return Promise.resolve(undefined);
   }
 
@@ -50,9 +55,20 @@ export class FriendRequestService implements IFriendRequestService {
     });
   }
 
-  isPending(userOneId: string, userTwoId: string) {}
+  isPending(userOneId: string, userTwoId: string) {
+    console.log(
+      '🚀 ~ FriendRequestService ~ isPending ~ userTwoId:',
+      userTwoId,
+    );
+    console.log(
+      '🚀 ~ FriendRequestService ~ isPending ~ userOneId:',
+      userOneId,
+    );
+    return Promise.resolve(undefined);
+  }
 
   reject(params: CancelFriendRequestParams): Promise<FriendRequest> {
+    console.log('🚀 ~ FriendRequestService ~ reject ~ params:', params);
     return Promise.resolve(undefined);
   }
 }

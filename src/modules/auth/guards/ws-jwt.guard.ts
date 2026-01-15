@@ -5,7 +5,6 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { AuthService } from '@/modules/auth/auth.service';
 import { TokenPayload } from '@/modules/auth/types/token-payload.type';
 import * as cookie from 'cookie';
 import { AuthenticatedSocket } from '@/modules/events/types';
