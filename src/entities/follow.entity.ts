@@ -4,26 +4,33 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Index,
+  Column,
 } from 'typeorm';
 import { User } from '@/entities/user.entity';
 
 @Entity()
+@Index(['followerId', 'followingId'], { unique: true })
 export class Follow {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User, (user) => user.followers, {
-    createForeignKeyConstraints: false,
-  })
-  @JoinColumn()
+  @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'followerId' })
   follower: User;
 
-  @ManyToOne(() => User, (user) => user.following, {
-    createForeignKeyConstraints: false,
-  })
-  @JoinColumn()
+  @Index()
+  @Column()
+  followerId: string;
+
+  @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'followingId' })
   following: User;
 
+  @Index()
+  @Column()
+  followingId: string;
+
   @CreateDateColumn()
-  createdAt: number;
+  createdAt: Date;
 }

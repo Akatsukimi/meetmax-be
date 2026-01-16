@@ -2,6 +2,7 @@ import { Module, Global } from '@nestjs/common';
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import Keyv from 'keyv';
 import KeyvRedis from '@keyv/redis';
+import Redis from 'ioredis';
 import { CacheService } from './cache.service';
 
 @Global()
@@ -23,7 +24,19 @@ import { CacheService } from './cache.service';
       },
       inject: [ConfigService],
     },
+    {
+      provide: 'REDIS_CLIENT',
+      useFactory: (configService: ConfigService) => {
+        return new Redis({
+          host: configService.get<string>('config.redis.host'),
+          port: configService.get<number>('config.redis.port'),
+          username: configService.get<string>('config.redis.username'),
+          password: configService.get<string>('config.redis.password'),
+        });
+      },
+      inject: [ConfigService],
+    },
   ],
-  exports: ['KEYV_INSTANCE', CacheService],
+  exports: ['KEYV_INSTANCE', CacheService, 'REDIS_CLIENT'],
 })
 export class CacheModule {}

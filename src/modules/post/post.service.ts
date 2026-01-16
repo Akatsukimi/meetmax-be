@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,6 +19,7 @@ export class PostService {
     private readonly postAttachmentRepository: Repository<PostAttachment>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    @Inject('RABBITMQ_SERVICE') private readonly rabbitClient: ClientProxy,
   ) {}
 
   private mapPostToResponseDto(
@@ -60,6 +62,13 @@ export class PostService {
       attachments.forEach((attachment) => (attachment.post = savedPost));
       await this.postAttachmentRepository.save(attachments);
     }
+
+    // Publish event to RabbitMQ
+    this.rabbitClient.emit('post.created', {
+      postId: savedPost.id,
+      authorId,
+      timestamp: Math.floor(Date.now() / 1000), // Unix timestamp in seconds
+    });
 
     return this.getPostById(savedPost.id, authorId);
   }

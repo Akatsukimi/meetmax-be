@@ -19,6 +19,10 @@ export default registerAs('config', () => ({
     password: process.env.REDIS_PASSWORD || 'pass',
   },
 
+  rabbitmq: {
+    uri: process.env.RABBITMQ_URI || 'amqp://localhost:5672',
+  },
+
   access_token: {
     secret: process.env.JWT_ACCESS_TOKEN_SECRET || 'defaultSecretKey',
     expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || '1800',

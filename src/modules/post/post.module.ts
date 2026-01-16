@@ -4,6 +4,7 @@ import { PostController } from './post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from '@/entities/post.entity';
 import { CacheModule } from '../cache/cache.module';
+import { RabbitMQModule } from '../rabbitmq/rabbitmq.module';
 import { Comment } from '@/entities/comment.entity';
 import { PostAttachment } from '@/entities/post-attachment.entity';
 
@@ -11,6 +12,7 @@ import { PostAttachment } from '@/entities/post-attachment.entity';
   imports: [
     TypeOrmModule.forFeature([Post, Comment, PostAttachment]),
     CacheModule,
+    RabbitMQModule,
   ],
   controllers: [PostController],
   providers: [PostService],
