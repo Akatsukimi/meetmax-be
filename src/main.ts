@@ -41,7 +41,6 @@ async function bootstrap() {
   });
 
   // Start both Microservices and HTTP Server
-  await app.startAllMicroservices();
-  await app.listen(port);
+  await Promise.all([app.startAllMicroservices(), app.listen(port)]);
 }
 bootstrap();
