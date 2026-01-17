@@ -10,6 +10,7 @@ import {
 } from 'src/private/jwt.constraint';
 import { User } from '@/entities/user.entity';
 import { compareText, hashText } from '@/shared/utils/auth-helpers';
+import { CookieHelper } from '@/shared/utils/cookie.helper';
 
 import { SignupDto } from './dto/signup.dto';
 import { TokenPayload } from './types/token-payload.type';
@@ -36,67 +37,50 @@ export class AuthService {
       password: hashText(signupDto.password),
     });
 
-    const { accessToken, refreshToken } = await this.generateTokens(user);
-    const userCookie = {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      avatar: user.avatar,
-    };
-    res.cookie('user', JSON.stringify(userCookie), {
-      httpOnly: true,
-      secure: true,
-    });
-    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+    const tokens = await this.generateTokens(user);
+    CookieHelper.setAuthCookies(res, user, tokens);
+
     return {
-      user: userCookie,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        avatar: user.avatar,
+      },
     };
   }
 
   async login(user: User, res: Response): Promise<AuthResponse> {
-    const { accessToken, refreshToken } = await this.generateTokens(user);
-    const userCookie = {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      avatar: user.avatar,
-    };
-    res.cookie('user', JSON.stringify(userCookie), {
-      httpOnly: true,
-      secure: true,
-    });
-    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+    const tokens = await this.generateTokens(user);
+    CookieHelper.setAuthCookies(res, user, tokens);
+
     return {
-      user: userCookie,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        avatar: user.avatar,
+      },
     };
   }
 
   async refreshToken(user: User, res: Response): Promise<AuthResponse> {
-    const { accessToken, refreshToken } = await this.generateTokens(user);
-    const userCookie = {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      avatar: user.avatar,
-    };
-    res.cookie('user', JSON.stringify(userCookie), {
-      httpOnly: true,
-      secure: true,
-    });
-    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+    const tokens = await this.generateTokens(user);
+    CookieHelper.setAuthCookies(res, user, tokens);
+
     return {
-      user: userCookie,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        avatar: user.avatar,
+      },
     };
   }
 
   async logout(user: User, res: Response): Promise<void> {
     await this.userService.deleteRefreshToken(user.id);
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
-    res.clearCookie('user');
+    CookieHelper.clearAuthCookies(res);
   }
 
   async getUserIfRefreshTokenMatched(

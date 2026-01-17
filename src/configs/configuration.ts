@@ -3,6 +3,10 @@ import { registerAs } from '@nestjs/config';
 export default registerAs('config', () => ({
   port: parseInt(process.env.PORT, 10) || 8000,
 
+  cors: {
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  },
+
   database: {
     type: process.env.DB_TYPE || 'mysql',
     host: process.env.DB_HOST || 'localhost',

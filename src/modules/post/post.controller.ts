@@ -17,6 +17,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtAccessTokenGuard } from '../auth/guards/jwt-access-token.guard';
 import { ROUTES } from '@/shared/constants/routes.enum';
+import { PAGINATION } from '@/shared/constants/pagination';
 import { AuthUser } from '@/shared/decorators/auth-user.decorator';
 import { User } from '@/entities/user.entity';
 
@@ -34,8 +35,8 @@ export class PostController {
   @Get()
   async findAll(
     @AuthUser() user: User,
-    @Query('page', ParseIntPipe) page = 1,
-    @Query('limit', ParseIntPipe) limit = 5,
+    @Query('page', ParseIntPipe) page = PAGINATION.DEFAULT_PAGE,
+    @Query('limit', ParseIntPipe) limit = PAGINATION.POST_DEFAULT_LIMIT,
   ) {
     return this.postService.getAllPosts(user.id, page, limit);
   }

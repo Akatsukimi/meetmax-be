@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import configuration from '@/configs/configuration';
+import { validate } from '@/configs/env.validation';
 import { UserModule } from '@/modules/user/user.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { DatabaseType } from '@/shared/constants/db.type';
@@ -27,13 +28,19 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { RabbitMQModule } from './modules/rabbitmq/rabbitmq.module';
 import { FollowModule } from './modules/follow/follow.module';
 import { TimelineModule } from './modules/timeline/timeline.module';
+import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
+import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggerModule } from './shared/utils/logger.module';
 
 @Module({
   imports: [
+    LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
       load: [configuration],
+      validate,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -77,6 +84,14 @@ import { TimelineModule } from './modules/timeline/timeline.module';
     {
       provide: APP_FILTER,
       useClass: ExpiredTokenFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
     },
   ],
 })

@@ -9,13 +9,15 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService: ConfigService = app.get<ConfigService>(ConfigService);
-  const port = +configService.get('PORT');
+  const port = +configService.get('config.port');
 
   app.use(cookieParser());
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.enableCors({
-    origin: configService.get<string>('CORS_ORIGIN') || 'http://localhost:3000',
+    origin:
+      configService.get<string>('config.cors.origin') ||
+      'http://localhost:3000',
     credentials: true,
   });
 
