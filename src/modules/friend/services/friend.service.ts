@@ -12,23 +12,38 @@ export class FriendService implements IFriendsService {
     private readonly friendsRepository: Repository<Friend>,
   ) {}
 
-  deleteFriend(params: DeleteFriendRequestParams) {
-    console.log('🚀 ~ FriendService ~ deleteFriend ~ params:', params);
+  async deleteFriend(params: DeleteFriendRequestParams) {
+    const { id, userId } = params;
+    const friend = await this.friendsRepository.findOne({
+      where: [
+        { id, sender: { id: userId } },
+        { id, receiver: { id: userId } },
+      ],
+    });
+    if (!friend) return null;
+    return this.friendsRepository.remove(friend);
   }
 
   findFriendById(id: string): Promise<Friend> {
-    console.log('🚀 ~ FriendService ~ findFriendById ~ id:', id);
-    return Promise.resolve(undefined);
+    return this.friendsRepository.findOne({
+      where: { id },
+      relations: ['sender', 'receiver'],
+    });
   }
 
   getFriends(id: string): Promise<Friend[]> {
-    console.log('🚀 ~ FriendService ~ getFriends ~ id:', id);
-    return Promise.resolve([]);
+    return this.friendsRepository.find({
+      where: [{ sender: { id } }, { receiver: { id } }],
+      relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
+    });
   }
 
   isFriends(userOneId: string, userTwoId: string): Promise<Friend | undefined> {
-    console.log('🚀 ~ FriendService ~ isFriends ~ userTwoId:', userTwoId);
-    console.log('🚀 ~ FriendService ~ isFriends ~ userOneId:', userOneId);
-    return Promise.resolve(undefined);
+    return this.friendsRepository.findOne({
+      where: [
+        { sender: { id: userOneId }, receiver: { id: userTwoId } },
+        { sender: { id: userTwoId }, receiver: { id: userOneId } },
+      ],
+    });
   }
 }

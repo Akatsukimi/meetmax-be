@@ -216,8 +216,18 @@ export class GroupMessageService implements IGroupMessageService {
     }
   }
 
-  editGroupMessage(params: EditGroupMessageParams): Promise<GroupMessage> {
-    console.log('editGroupMessage', params);
-    return Promise.resolve(undefined);
+  async editGroupMessage(params: EditGroupMessageParams) {
+    const { groupId, messageId, userId, content } = params;
+    const message = await this.groupMessageRepository.findOne({
+      where: {
+        id: messageId,
+        author: { id: userId },
+        group: { id: groupId },
+      },
+    });
+    if (!message) throw new BadRequestException('Cannot edit message');
+
+    message.content = content;
+    return this.groupMessageRepository.save(message);
   }
 }

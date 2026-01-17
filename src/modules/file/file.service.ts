@@ -15,6 +15,7 @@ import { PostAttachment } from '@/entities/post-attachment.entity';
 import { AvatarAttachment } from '@/entities/avatar-attachment.entity';
 import { FileType } from '@/shared/constants/file-type';
 import { CoverPhotoAttachment } from '@/entities/cover-photo-attachment.entity';
+import { LoggerService } from '@/shared/utils/logger.service';
 
 @Injectable()
 export class FileService {
@@ -30,7 +31,10 @@ export class FileService {
     private readonly avatarAttachmentRepository: Repository<AvatarAttachment>,
     @InjectRepository(CoverPhotoAttachment)
     private readonly coverPhotoAttachmentRepository: Repository<CoverPhotoAttachment>,
-  ) {}
+    private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext('FileService');
+  }
 
   private readonly s3Client = new S3Client({
     region: this.configService.get('config.aws.s3.region'),
@@ -66,8 +70,8 @@ export class FileService {
     try {
       await this.s3Client.send(putCommand);
     } catch (error) {
-      console.log('Error uploading file to S3', error);
-      throw new InternalServerErrorException();
+      this.logger.error('Error uploading file to S3', error.stack);
+      throw new InternalServerErrorException('Failed to upload file');
     }
 
     let newFile;
@@ -142,7 +146,7 @@ export class FileService {
     try {
       await this.s3Client.send(deleteCommand);
     } catch (error) {
-      console.log('Error deleting file from S3', error);
+      this.logger.error('Error deleting file from S3', error.stack);
       throw new InternalServerErrorException('Error deleting file from S3');
     }
   }
@@ -160,7 +164,10 @@ export class FileService {
         await this.deleteFileFromS3(file.key);
         await this.postAttachmentRepository.remove(file);
       } catch (error) {
-        console.log('Error cleaning up junk file', error);
+        this.logger.error(
+          `Error cleaning up junk file ${file.key}`,
+          error.stack,
+        );
       }
     }
   }

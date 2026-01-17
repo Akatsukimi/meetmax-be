@@ -23,10 +23,11 @@ import { IAuthService } from '@/modules/auth/auth';
 import { CreateGroupMessageResponse } from '@/modules/group/types/create-group-message-res.type';
 import { Group } from '@/entities/group.entity';
 import { AddGroupUserResponse } from '@/modules/group/types/add-group-user-res.type';
+import { LoggerService } from '@/shared/utils/logger.service';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000'],
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     credentials: true,
   },
   pingInterval: 10000,
@@ -41,7 +42,10 @@ export class EventsGateway
     private readonly sessions: GatewaySessionManager,
     @Inject(Services.CONVERSATIONS)
     private readonly conversationService: IConversationsService,
-  ) {}
+    private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext('EventsGateway');
+  }
 
   @WebSocketServer()
   server: Server;
@@ -219,7 +223,7 @@ export class EventsGateway
   @OnEvent('group.message.delete')
   async handleGroupMessageDelete(payload: CreateGroupMessageResponse) {
     Logger.log('group.message.create');
-    console.log('payload', payload);
+    this.logger.debug(`Received payload: ${JSON.stringify(payload)}`);
     const { id } = payload.group;
     this.server.to(`group-${id}`).emit('onGroupMessageDelete', payload);
   }

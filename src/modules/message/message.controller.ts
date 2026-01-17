@@ -75,7 +75,6 @@ export class MessageController {
     @Param('conversationId') conversationId: string,
     @Param('messageId') messageId: string,
   ): Promise<any> {
-    console.log('deleteMessage controller', conversationId, messageId);
     const params = { userId: user.id, conversationId, messageId };
     await this.messageService.deleteMessage(params);
     this.eventEmitter.emit('message.delete', params);

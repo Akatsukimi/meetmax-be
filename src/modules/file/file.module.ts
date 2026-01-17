@@ -7,6 +7,7 @@ import { GroupMessageAttachment } from '@/entities/group-message-attachment.enti
 import { PostAttachment } from '@/entities/post-attachment.entity';
 import { AvatarAttachment } from '@/entities/avatar-attachment.entity';
 import { CoverPhotoAttachment } from '@/entities/cover-photo-attachment.entity';
+import { LoggerService } from '@/shared/utils/logger.service';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { CoverPhotoAttachment } from '@/entities/cover-photo-attachment.entity';
     ]),
   ],
   controllers: [FileController],
-  providers: [FileService],
+  providers: [FileService, LoggerService],
   exports: [FileService],
 })
 export class FileModule {}

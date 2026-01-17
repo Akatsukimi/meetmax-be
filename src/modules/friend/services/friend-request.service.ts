@@ -25,23 +25,55 @@ export class FriendRequestService implements IFriendRequestService {
     private readonly friendsService: IFriendsService,
   ) {}
 
-  accept(params: FriendRequestParams): Promise<AcceptFriendResponse> {
-    console.log('🚀 ~ FriendRequestService ~ accept ~ params:', params);
-    return Promise.resolve(undefined);
+  async accept(params: FriendRequestParams): Promise<AcceptFriendResponse> {
+    const { id, userId } = params;
+    const friendRequest = await this.friendRequestRepository.findOne({
+      where: { id, receiver: { id: userId } },
+      relations: ['sender', 'receiver'],
+    });
+    if (!friendRequest) return null;
+
+    // Create friend relationship
+    const friend = this.friendRepository.create({
+      sender: friendRequest.sender,
+      receiver: friendRequest.receiver,
+    });
+    await this.friendRepository.save(friend);
+
+    // Update friend request status
+    friendRequest.status = 'accepted';
+    await this.friendRequestRepository.save(friendRequest);
+
+    return { friend, friendRequest };
   }
 
-  cancel(params: CancelFriendRequestParams): Promise<FriendRequest> {
-    console.log('🚀 ~ FriendRequestService ~ cancel ~ params:', params);
-    return Promise.resolve(undefined);
+  async cancel(params: CancelFriendRequestParams): Promise<FriendRequest> {
+    const { id, userId } = params;
+    const friendRequest = await this.friendRequestRepository.findOne({
+      where: { id, sender: { id: userId } },
+    });
+    if (!friendRequest) return null;
+    return this.friendRequestRepository.remove(friendRequest);
   }
 
-  create(params: CreateFriendParams) {
-    console.log('🚀 ~ FriendRequestService ~ create ~ params:', params);
+  async create(params: CreateFriendParams) {
+    const { user, username } = params;
+    const receiver = await this.userService.findUser({ username });
+    if (!receiver) return null;
+
+    const friendRequest = this.friendRequestRepository.create({
+      sender: user,
+      receiver,
+      status: 'pending',
+    });
+    return this.friendRequestRepository.save(friendRequest);
   }
 
   findById(id: string): Promise<FriendRequest> {
-    console.log('🚀 ~ FriendRequestService ~ findById ~ id:', id);
-    return Promise.resolve(undefined);
+    return this.friendRequestRepository.findOne({
+      where: { id },
+      relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
+    });
   }
 
   getFriendRequests(userId: string): Promise<FriendRequest[]> {
@@ -55,20 +87,31 @@ export class FriendRequestService implements IFriendRequestService {
     });
   }
 
-  isPending(userOneId: string, userTwoId: string) {
-    console.log(
-      '🚀 ~ FriendRequestService ~ isPending ~ userTwoId:',
-      userTwoId,
-    );
-    console.log(
-      '🚀 ~ FriendRequestService ~ isPending ~ userOneId:',
-      userOneId,
-    );
-    return Promise.resolve(undefined);
+  async isPending(userOneId: string, userTwoId: string) {
+    return this.friendRequestRepository.findOne({
+      where: [
+        {
+          sender: { id: userOneId },
+          receiver: { id: userTwoId },
+          status: 'pending',
+        },
+        {
+          sender: { id: userTwoId },
+          receiver: { id: userOneId },
+          status: 'pending',
+        },
+      ],
+    });
   }
 
-  reject(params: CancelFriendRequestParams): Promise<FriendRequest> {
-    console.log('🚀 ~ FriendRequestService ~ reject ~ params:', params);
-    return Promise.resolve(undefined);
+  async reject(params: CancelFriendRequestParams): Promise<FriendRequest> {
+    const { id, userId } = params;
+    const friendRequest = await this.friendRequestRepository.findOne({
+      where: { id, receiver: { id: userId } },
+    });
+    if (!friendRequest) return null;
+
+    friendRequest.status = 'rejected';
+    return this.friendRequestRepository.save(friendRequest);
   }
 }

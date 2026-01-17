@@ -15,8 +15,7 @@ export class FriendController {
   ) {}
 
   @Get()
-  getFriends(@AuthUser() user: User) {
-    console.log('Fetching Friends');
+  getAllFriends(@AuthUser() user: User) {
     return this.friendsService.getFriends(user.id);
   }
 

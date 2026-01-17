@@ -14,7 +14,10 @@ async function bootstrap() {
   app.use(cookieParser());
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  app.enableCors({ origin: ['http://localhost:3000'], credentials: true });
+  app.enableCors({
+    origin: configService.get<string>('CORS_ORIGIN') || 'http://localhost:3000',
+    credentials: true,
+  });
 
   // Connect RabbitMQ Microservice
   app.connectMicroservice({
