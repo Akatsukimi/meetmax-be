@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { Transport } from '@nestjs/microservices';
 
@@ -14,6 +14,10 @@ async function bootstrap() {
   app.use(cookieParser());
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+
+  // Enable class-transformer serialization globally
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+
   app.enableCors({
     origin:
       configService.get<string>('config.cors.origin') ||
