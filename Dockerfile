@@ -7,14 +7,27 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install all dependencies (including dev dependencies for building)
-# npm ci is faster and more reliable than npm install for builds
 RUN npm ci
 
 # Copy source code
 COPY . .
 
-RUN npm install
+# Build the application
+RUN npm run build
+
+# Production Stage
+FROM node:20-alpine AS production
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+# Install only production dependencies to keep image small
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built assets from builder stage
+COPY --from=builder /usr/src/app/dist ./dist
 
 EXPOSE 8000
 
-CMD ["npm", "run", "start:dev"]
+CMD ["node", "dist/main"]
