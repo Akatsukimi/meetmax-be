@@ -100,9 +100,15 @@ export class EventsGateway
     Logger.log(data.groupId);
     Logger.log(JSON.stringify(client.rooms));
     if (data.groupId) {
-      client.to(`group-${data.groupId}`).emit('onTypingStart');
+      client.to(`group-${data.groupId}`).emit('onTypingStart', {
+        user: client.user,
+        groupId: data.groupId,
+      });
     } else {
-      client.to(`conversation-${data.conversationId}`).emit('onTypingStart');
+      client.to(`conversation-${data.conversationId}`).emit('onTypingStart', {
+        user: client.user,
+        conversationId: data.conversationId,
+      });
     }
   }
 
@@ -116,9 +122,15 @@ export class EventsGateway
     Logger.log(data.groupId);
     Logger.log(JSON.stringify(client.rooms));
     if (data.groupId) {
-      client.to(`group-${data.groupId}`).emit('onTypingStop');
+      client.to(`group-${data.groupId}`).emit('onTypingStop', {
+        user: client.user,
+        groupId: data.groupId,
+      });
     } else {
-      client.to(`conversation-${data.conversationId}`).emit('onTypingStop');
+      client.to(`conversation-${data.conversationId}`).emit('onTypingStop', {
+        user: client.user,
+        conversationId: data.conversationId,
+      });
     }
   }
 
