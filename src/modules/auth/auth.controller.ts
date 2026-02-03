@@ -8,6 +8,7 @@ import {
   Req,
   Res,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -32,28 +33,34 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  async signup(@Body() signupDto: SignupDto, @Res() res: Response) {
-    return res
-      .status(HttpStatus.CREATED)
-      .send(await this.authService.signup(signupDto, res));
+  @HttpCode(HttpStatus.CREATED)
+  async signup(
+    @Body() signupDto: SignupDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return await this.authService.signup(signupDto, res);
   }
 
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() request: AuthenticatedRequest, @Res() res: Response) {
-    return res
-      .status(HttpStatus.OK)
-      .send(await this.authService.login(request.user, res));
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Req() request: AuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return await this.authService.login(request.user, res);
   }
 
   @Public()
   @UseGuards(JwtRefreshTokenGuard)
   @Post('refresh')
-  async refresh(@AuthUser() user: User, @Res() res: Response) {
-    return res
-      .status(HttpStatus.OK)
-      .send(await this.authService.refreshToken(user, res));
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @AuthUser() user: User,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return await this.authService.refreshToken(user, res);
   }
 
   @Get('profile')
@@ -68,9 +75,11 @@ export class AuthController {
 
   @UseGuards(JwtAccessTokenGuard)
   @Post('logout')
-  async logout(@AuthUser() user: User, @Res() res: Response) {
-    res
-      .status(HttpStatus.NO_CONTENT)
-      .send(await this.authService.logout(user, res));
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(
+    @AuthUser() user: User,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.authService.logout(user, res);
   }
 }
